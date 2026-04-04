@@ -27,7 +27,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	
 
 	<dependencies>
 		<!-- Source:
@@ -56,8 +55,6 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Source:
-	https://mvnrepository.com/artifact/io.rest-assured/json-schema-validator -->
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>json-schema-validator</artifactId>
