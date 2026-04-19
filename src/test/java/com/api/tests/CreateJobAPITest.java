@@ -2,6 +2,12 @@ package com.api.tests;
 
 import static com.api.constant.Role.FD;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.startsWith;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.testng.annotations.Test;
 
@@ -10,11 +16,9 @@ import com.api.pojo.Customer;
 import com.api.pojo.CustomerAddress;
 import com.api.pojo.CustomerProduct;
 import com.api.pojo.Problems;
-import com.api.utils.AuthTokenProvider;
-import com.api.utils.ConfigManager;
 import com.api.utils.SpecUtil;
 
-import io.restassured.http.ContentType;
+import io.restassured.module.jsv.JsonSchemaValidator;
 
 public class CreateJobAPITest {
 
@@ -26,11 +30,11 @@ public class CreateJobAPITest {
 		Customer customer = new Customer("Tushar", "arban", "9022839909", "", "tushararbansdet@gmail.com", "");
 		CustomerAddress customerAddress = new CustomerAddress("Sector 17", "Shyam", "kamothe", "Navi Mumbai", "Panvel",
 				"410209", "India", "Maharashtra");
-		CustomerProduct customerProduct = new CustomerProduct("2025-09-30T18:30:00.000Z", "12929801993562",
-				"12929801993562", "12929801993562", "2025-09-30T18:30:00.000Z", 1, 2);
+		CustomerProduct customerProduct = new CustomerProduct("2025-09-30T18:30:00.000Z", "12929801993566",
+				"12929801993566", "12929801993566", "2025-09-30T18:30:00.000Z", 1, 2);
 		Problems problems = new Problems(1, "Battery Issue");
-		Problems[] problemsArray = new Problems[1];
-		problemsArray[0] = problems;
+		List<Problems> problemsArray = new ArrayList<Problems>();
+		problemsArray.add(problems);
 		CreateJobPayload createJobPayload = new CreateJobPayload(0, 2, 1, 1, customer, customerAddress, customerProduct,
 				problemsArray);
 
@@ -40,7 +44,13 @@ public class CreateJobAPITest {
 		.when()
 			.post("/job/create")
 		.then()
-			.spec(SpecUtil.responseSpec_OK());
+			.spec(SpecUtil.responseSpec_OK())
+			.body(JsonSchemaValidator.matchesJsonSchemaInClasspath("response-schema/CreateJobAPIResponseSchema.json"))
+			.body("message", equalTo("Job created successfully. "))
+			.body("data", notNullValue())
+			.body("data.mst_service_location_id", equalTo(1))
+			.body("data.job_number", startsWith("JOB_"));
+	
 	}
 
 }
